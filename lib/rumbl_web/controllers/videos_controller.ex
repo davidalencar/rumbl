@@ -4,18 +4,23 @@ defmodule RumblWeb.VideosController do
   alias Rumbl.Multimedia
   alias Rumbl.Multimedia.Videos
 
-  def index(conn, _params) do
-    videos = Multimedia.list_videos()
+  def action(conn, _) do
+    args = [conn,conn.params,  conn.assigns.current_user]
+    apply(__MODULE__, action_name(conn), args)
+  end
+
+  def index(conn, _params, current_user ) do
+    videos = Multimedia.list_user_videos(current_user)
     render(conn, "index.html", videos: videos)
   end
 
-  def new(conn, _params) do
+  def new(conn, _params, _current_user) do
     changeset = Multimedia.change_videos(%Videos{})
     render(conn, "new.html", changeset: changeset)
   end
 
-  def create(conn, %{"videos" => videos_params}) do
-    case Multimedia.create_videos(videos_params) do
+  def create(conn, %{"videos" => videos_params}, current_user) do
+    case Multimedia.create_videos(current_user, videos_params) do
       {:ok, videos} ->
         conn
         |> put_flash(:info, "Videos created successfully.")
@@ -26,8 +31,8 @@ defmodule RumblWeb.VideosController do
     end
   end
 
-  def show(conn, %{"id" => id}) do
-    videos = Multimedia.get_videos!(id)
+  def show(conn, %{"id" => id}, current_user) do
+    videos = Multimedia.get_user_video(current_user, id)
     render(conn, "show.html", videos: videos)
   end
 
@@ -37,8 +42,8 @@ defmodule RumblWeb.VideosController do
     render(conn, "edit.html", videos: videos, changeset: changeset)
   end
 
-  def update(conn, %{"id" => id, "videos" => videos_params}) do
-    videos = Multimedia.get_videos!(id)
+  def update(conn, %{"id" => id, "videos" => videos_params}, current_user) do
+    videos = Multimedia.get_user_video(current_user, id)
 
     case Multimedia.update_videos(videos, videos_params) do
       {:ok, videos} ->
@@ -51,8 +56,8 @@ defmodule RumblWeb.VideosController do
     end
   end
 
-  def delete(conn, %{"id" => id}) do
-    videos = Multimedia.get_videos!(id)
+  def delete(conn, %{"id" => id}, current_user) do
+    videos = Multimedia.get_user_video(current_user, id)
     {:ok, _videos} = Multimedia.delete_videos(videos)
 
     conn

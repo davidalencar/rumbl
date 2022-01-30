@@ -49,9 +49,10 @@ defmodule Rumbl.Multimedia do
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_videos(attrs \\ %{}) do
+  def create_videos(%Rumbl.Accounts.User{} = user, attrs \\ %{}) do
     %Videos{}
     |> Videos.changeset(attrs)
+    |> Ecto.Changeset.put_assoc(:user, user)
     |> Repo.insert()
   end
 
@@ -100,5 +101,24 @@ defmodule Rumbl.Multimedia do
   """
   def change_videos(%Videos{} = videos, attrs \\ %{}) do
     Videos.changeset(videos, attrs)
+  end
+
+
+  
+  def list_user_videos(%Rumbl.Accounts.User{} = user) do
+    Videos
+    |> user_videos_query(user)
+    |> Repo.all()
+  end
+
+  def get_user_video(%Rumbl.Accounts.User{} = user, id) do
+    Videos
+    |> user_videos_query(user)
+    |> Repo.get!(id)
+  end
+
+
+  def user_videos_query(query, %Rumbl.Accounts.User{id: user_id}) do
+    from(v in query, where: v.user_id == ^user_id)
   end
 end
