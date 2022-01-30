@@ -4,6 +4,8 @@ defmodule RumblWeb.VideosController do
   alias Rumbl.Multimedia
   alias Rumbl.Multimedia.Videos
 
+  plug :load_categories when action in [:new, :create, :edit, :update] 
+
   def action(conn, _) do
     args = [conn,conn.params,  conn.assigns.current_user]
     apply(__MODULE__, action_name(conn), args)
@@ -63,5 +65,10 @@ defmodule RumblWeb.VideosController do
     conn
     |> put_flash(:info, "Videos deleted successfully.")
     |> redirect(to: Routes.videos_path(conn, :index))
+  end
+
+  defp load_categories(conn, _) do
+    conn
+    |> assign(:categories, Multimedia.list_alphabetical_categories())
   end
 end
