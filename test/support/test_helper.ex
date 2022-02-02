@@ -6,8 +6,7 @@ defmodule Rumbl.TestHelpers do
 
   def user_fixture(attrs \\ %{}) do
     {:ok, user} = 
-      attrs
-      |> Enum.into(%{
+      attrs =  Enum.into(attrs, %{
         name: "some name",
         username: "user#{System.unique_integer([:positive])}",
         password: attrs[:password] || "supersecret" })
@@ -17,8 +16,7 @@ defmodule Rumbl.TestHelpers do
   end
 
   def videos_fixture(%Accounts.User{} = user, attrs \\ %{}) do
-      attrs
-      |> Enum.into(%{
+      attrs = Enum.into(attrs, %{
         description: "some description",
         title: "some title",
         url: "some url"
