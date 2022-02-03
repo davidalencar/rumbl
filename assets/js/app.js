@@ -21,6 +21,31 @@ import "../css/app.css"
 
 // Include phoenix_html to handle method=PUT/DELETE in forms and buttons.
 import "phoenix_html"
+
+import css from "../css/app.css"
+
+// webpack automatically bundles all modules in your
+// entry points. Those entry points can be configured
+// in "webpack.config.js".
+//
+// Import dependencies
+//
+import "phoenix_html"
+
+// Import local files
+//
+// Local files can be imported directly using relative paths, for example:
+// import socket from "./socket"
+
+import Player from "./player"
+let video = document.getElementById("video")
+
+if(video) {
+  Player.init(video.id, video.getAttribute("data-player-id"), () => {
+    console.log("player ready!")
+  })
+}
+
 // Establish Phoenix Socket and LiveView configuration.
 import {Socket} from "phoenix"
 import {LiveSocket} from "phoenix_live_view"
