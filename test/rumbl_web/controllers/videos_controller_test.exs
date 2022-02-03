@@ -37,8 +37,5 @@ defmodule VideosControllerTest do
       assert String.contains?(conn.resp_body, user_video.title)
       refute  String.contains?(conn.resp_body, other_video.title)
     end
-
-
   end
-
 end
