@@ -38,8 +38,8 @@ defmodule RumblWeb.VideosController do
     render(conn, "show.html", videos: videos)
   end
 
-  def edit(conn, %{"id" => id}) do
-    videos = Multimedia.get_videos!(id)
+  def edit(conn, %{"id" => id}, current_user) do
+    videos = Multimedia.get_user_video(current_user, id)
     changeset = Multimedia.change_videos(videos)
     render(conn, "edit.html", videos: videos, changeset: changeset)
   end
