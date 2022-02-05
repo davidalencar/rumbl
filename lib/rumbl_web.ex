@@ -82,7 +82,7 @@ defmodule RumblWeb do
   def channel do
     quote do
       use Phoenix.Channel
-      import RumblWeb.Gettext
+      import RumblWeb.Gettext      
     end
   end
 
