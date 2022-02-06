@@ -1,4 +1,5 @@
 import Player from "./player"
+import {Presence} from "phoenix"
 
 let Video = {
     init(socket, element){ if(!element){ return }
@@ -14,9 +15,18 @@ let Video = {
         let msgContainer = document.getElementById("msg-container")
         let msgInput     = document.getElementById("msg-input")
         let postButton   = document.getElementById("msg-submit")
-        let vidChannel   = socket.channel("videos:" + videoId)
+        let userList     = document.getElementById("user-list")
+        let lastSennId = 0
+        let vidChannel   = socket.channel("videos:" + videoId, () => {return {last_seen_id: lastSennId}})
 
-    //vidChannel.on("ping", ({count}) => console.log("PING", count))
+        let presence = new Presence(vidChannel)
+        presence.onSync(() => {
+          userList.innerHTML = presence.list((id, {metas: [first, ...rest]}) => {
+            let count = rest.length + 1
+            return `<li>${id}: (${count})</li>`
+          }).join("")
+        })
+
 
       postButton.addEventListener("click", e => {
               let payload = {body: msgInput.value, at: Player.getCurrentTime()}
@@ -35,11 +45,14 @@ let Video = {
         })
 
       vidChannel.on("new_annotation", (resp) => {
+          lastSennId = resp.id
           this.renderAnnotation(msgContainer, resp)
         })
 
       vidChannel.join()
           .receive("ok", resp => {
+            let ids = resp.annotations.map(ann => ann.id)
+            if(ids.length > 0){ lastSeenId = Math.max(...ids) }
             this.scheduleMessages(msgContainer, resp.annotations)
           })
           .receive("error", reason => console.log("join failed", reason))
